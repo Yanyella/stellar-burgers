@@ -1,63 +1,65 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getFeedsApi, getOrderByNumberApi } from '@api';
 import { TOrder } from '@utils-types';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getFeedsApi, getOrdersApi } from '@api';
 
-interface IFeedState {
-  orders: TOrder[]; //заказы
-  total: number; //количество заказов
-  totalToday: number; //количество заказов сегодня
-  error: string | null; //ошибка
-  isLoading: boolean; //загрузка
-  userOrders: TOrder[] | null; //заказы пользователя
-  userOrdersLoading: boolean; //загрузка заказов пользователя
-  userOrdersError: string | null; //ошибка загрузки заказов пользователя
-}
-
-//начальное состояние
-const initialState: IFeedState = {
-  orders: [], //заказы
-  total: 0, //количество заказов
-  totalToday: 0, //количество заказов сегодня
-  error: null, //ошибка
-  isLoading: true, //загрузка
-  userOrders: [], //заказы пользователя
-  userOrdersLoading: true, //загрузка заказов пользователя
-  userOrdersError: null //ошибка загрузки заказов пользователя
+// Тип состояния
+type TFeedsState = {
+  orders: TOrder[]; //массив заказов
+  total: number; //общее кол-во заказов
+  totalToday: number; //сегодняшние заказы
+  isLoading: boolean; //загрузка ленты
+  error: string | null; //ошибки
 };
 
-//запрос к серверу лента
+// Начальное состояние
+export const initialState: TFeedsState = {
+  orders: [],
+  total: 0,
+  totalToday: 0,
+  isLoading: false,
+  error: null
+};
+
 export const getFeeds = createAsyncThunk(
   'feed/getFeeds',
-  async (_, thunkAPI) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getFeedsApi();
       return response;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
     }
   }
 );
 
-//запрос к серверу с заказами пользователя
-export const getOrders = createAsyncThunk(
-  'feed/getOrders',
-  async (_, thunkAPI) => {
+export const getOrderByNumber = createAsyncThunk(
+  'feed/getOrderByNumber',
+  async (number: number, { rejectWithValue }) => {
     try {
-      const response = await getOrdersApi();
-      return response;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      const response = await getOrderByNumberApi(number);
+      return response.orders[0];
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
     }
   }
 );
 
-export const feedSlice = createSlice({
+const feedSlice = createSlice({
   name: 'feed',
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearFeeds: (state) => {
+      state.orders = [];
+      state.total = 0;
+      state.totalToday = 0;
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      //лента заказов
       .addCase(getFeeds.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -72,17 +74,16 @@ export const feedSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      //заказы пользователя
-      .addCase(getOrders.pending, (state) => {
-        state.userOrdersLoading = true;
-        state.userOrdersError = null;
+      // Обработка fetchOrderByNumber
+      .addCase(getOrderByNumber.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
       })
-      .addCase(getOrders.fulfilled, (state, action) => {
-        state.userOrders = action.payload;
-        state.userOrdersLoading = false;
+      .addCase(getOrderByNumber.fulfilled, (state) => {
+        state.isLoading = false;
       })
-      .addCase(getOrders.rejected, (state, action) => {
-        state.userOrdersLoading = false;
+      .addCase(getOrderByNumber.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload as string;
       });
   }

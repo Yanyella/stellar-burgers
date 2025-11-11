@@ -13,11 +13,11 @@ import feedReducer from './slices/feedSlice';
 
 const store = configureStore({
   reducer: {
+    feed: feedReducer,
     user: userReducer,
     ingredients: ingredientsReducer,
     orders: ordersReducer,
-    burger: burgerReducer,
-    feed: feedReducer
+    burger: burgerReducer
   },
   devTools: process.env.NODE_ENV !== 'production'
 });

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useNavigate } from 'react-router-dom';
-import { createOrder, clearOrderModal } from '../../services/slices/orderSlice';
+import { createOrder, clearOrder } from '../../services/slices/orderSlice';
 import { RootState, AppDispatch } from '../../services/store';
 
 export const BurgerConstructor: FC = () => {
@@ -37,7 +37,7 @@ export const BurgerConstructor: FC = () => {
   };
 
   const closeOrderModal = () => {
-    dispatch(clearOrderModal());
+    dispatch(clearOrder());
   };
 
   const price = useMemo(

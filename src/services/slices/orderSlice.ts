@@ -1,24 +1,35 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { orderBurgerApi, getOrderByNumberApi } from '@api';
+import { orderBurgerApi, getOrderByNumberApi, getOrdersApi } from '@api';
 import { TOrder } from '@utils-types';
 
 interface IOrdersState {
-  order: TOrder | null;
-  orderRequest: boolean;
-  orderModal: TOrder | null;
-  error: string | null;
+  orders: TOrder[]; //все заказы
+  orderLoading: boolean; //загрузка конкретного заказа
+  orderModal: TOrder | null; //модальное окно заказа
+  orderRequest: boolean; //статус запроса на создание заказа
+  loading: boolean; // загрузка всех заказов
+  error: string | null; //ошибки
 }
 
+//начальное состояние
 const initialState: IOrdersState = {
-  order: null,
-  orderRequest: false,
-  orderModal: null,
-  error: null
+  orders: [], //все заказы
+  orderLoading: false, //загрузка конкретного заказа
+  orderModal: null, //модальное окно заказа
+  orderRequest: false, //статус запроса на создание заказа
+  loading: false, // загрузка всех заказов
+  error: null //ошибки
 };
+
+//получение списка заказов
+export const getOrders = createAsyncThunk(
+  'order/getOrders',
+  async () => await getOrdersApi()
+);
 
 // Создание нового заказа
 export const createOrder = createAsyncThunk(
-  'orders/createOrder',
+  'order/createOrder',
   async (ingredientIds: string[], thunkAPI) => {
     try {
       const response = await orderBurgerApi(ingredientIds);
@@ -31,7 +42,7 @@ export const createOrder = createAsyncThunk(
 
 // Получение заказа по номеру
 export const fetchOrderByNumber = createAsyncThunk(
-  'orders/fetchOrderByNumber',
+  'order/fetchOrderByNumber',
   async (number: number, thunkAPI) => {
     try {
       const response = await getOrderByNumberApi(number);
@@ -42,58 +53,55 @@ export const fetchOrderByNumber = createAsyncThunk(
   }
 );
 
-const ordersSlice = createSlice({
-  name: 'orders',
+const orderSlice = createSlice({
+  name: 'order',
   initialState,
   reducers: {
-    clearOrder(state) {
-      state.order = null;
-      state.orderRequest = false;
-      state.error = null;
-    },
-    setOrderModal: (state, action) => {
-      state.orderModal = action.payload;
-    },
-    clearOrderModal(state) {
+    clearOrder: (state) => {
       state.orderModal = null;
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
-    builder
+    builder //обработка списка заказов
+      .addCase(getOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(getOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      }) //обработка заказа по номеру
+      .addCase(fetchOrderByNumber.pending, (state) => {
+        state.orderLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderByNumber.fulfilled, (state, action) => {
+        state.orderLoading = false;
+        state.orderModal = action.payload;
+      })
+      .addCase(fetchOrderByNumber.rejected, (state, action) => {
+        state.orderLoading = false;
+        state.error = action.payload as string;
+      }) //обработка созданного заказа
       .addCase(createOrder.pending, (state) => {
         state.orderRequest = true;
         state.error = null;
       })
-      .addCase(
-        createOrder.fulfilled,
-        (state, action: PayloadAction<TOrder>) => {
-          state.orderRequest = false;
-          state.order = action.payload;
-          state.orderModal = action.payload;
-        }
-      )
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderModal = action.payload;
+        state.orderRequest = false;
+      })
       .addCase(createOrder.rejected, (state, action) => {
         state.orderRequest = false;
-        state.error = action.error.message as string;
-      })
-
-      .addCase(fetchOrderByNumber.pending, (state) => {
-        state.orderRequest = true;
-        state.error = null;
-      })
-      .addCase(
-        fetchOrderByNumber.fulfilled,
-        (state, action: PayloadAction<TOrder>) => {
-          state.orderRequest = false;
-          state.orderModal = action.payload;
-        }
-      )
-      .addCase(fetchOrderByNumber.rejected, (state, action) => {
-        state.orderRequest = false;
-        state.error = action.error.message as string;
+        state.error = action.payload as string;
       });
   }
 });
-
-export const { clearOrder, clearOrderModal } = ordersSlice.actions;
-export default ordersSlice.reducer;
+export const { clearOrder } = orderSlice.actions;
+export default orderSlice.reducer;

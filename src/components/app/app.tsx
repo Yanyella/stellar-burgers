@@ -25,6 +25,8 @@ function App() {
   const location = useLocation();
   const backgroundLocation = location.state?.background;
   const navigate = useNavigate();
+  const { isAuthChecked, isLoading } = useSelector((state) => state.user);
+  console.log('User state:', { isAuthChecked, isLoading });
 
   useEffect(() => {
     dispatch(getUser());
@@ -41,7 +43,6 @@ function App() {
       <Routes location={backgroundLocation || location}>
         <Route path={'/'} element={<ConstructorPage />} />
         <Route path={'/feed'} element={<Feed />} />
-        {/* Маршруты только для НЕавторизованных пользователей */}
         <Route
           path={'/login'}
           element={
@@ -90,8 +91,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path={'/feed/:orderNumber'} element={<OrderInfo />} />
-        <Route path={'/ingredients/:id'} element={<IngredientDetails />} />
         <Route
           path={'/profile/orders/:orderNumber'}
           element={
@@ -100,6 +99,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path={'/feed/:orderNumber'} element={<OrderInfo />} />
+        <Route path={'/ingredients/:id'} element={<IngredientDetails />} />
         <Route path={'*'} element={<NotFound404 />} />
       </Routes>
 
