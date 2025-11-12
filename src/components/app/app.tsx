@@ -25,9 +25,6 @@ function App() {
   const location = useLocation();
   const backgroundLocation = location.state?.background;
   const navigate = useNavigate();
-  const { isAuthChecked, isLoading } = useSelector((state) => state.user);
-  console.log('User state:', { isAuthChecked, isLoading });
-
   useEffect(() => {
     dispatch(getUser());
     dispatch(getIngredients());

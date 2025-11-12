@@ -1,15 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getFeedsApi, getOrderByNumberApi } from '@api';
 import { TOrder } from '@utils-types';
-
-// Тип состояния
-type TFeedsState = {
+interface TFeedsState {
   orders: TOrder[]; //массив заказов
   total: number; //общее кол-во заказов
-  totalToday: number; //сегодняшние заказы
+  totalToday: number; //кол-во сегодняшних заказов
   isLoading: boolean; //загрузка ленты
   error: string | null; //ошибки
-};
+}
 
 // Начальное состояние
 export const initialState: TFeedsState = {
@@ -19,7 +17,7 @@ export const initialState: TFeedsState = {
   isLoading: false,
   error: null
 };
-
+//загрузка ленты заказов
 export const getFeeds = createAsyncThunk(
   'feed/getFeeds',
   async (_, { rejectWithValue }) => {
@@ -31,7 +29,7 @@ export const getFeeds = createAsyncThunk(
     }
   }
 );
-
+//загрузка заказа с номером
 export const getOrderByNumber = createAsyncThunk(
   'feed/getOrderByNumber',
   async (number: number, { rejectWithValue }) => {
@@ -47,19 +45,9 @@ export const getOrderByNumber = createAsyncThunk(
 const feedSlice = createSlice({
   name: 'feed',
   initialState,
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-    clearFeeds: (state) => {
-      state.orders = [];
-      state.total = 0;
-      state.totalToday = 0;
-      state.error = null;
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
+    builder //обработка ленты заказов
       .addCase(getFeeds.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -74,7 +62,7 @@ const feedSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      // Обработка fetchOrderByNumber
+      // Обработка заказа с номером
       .addCase(getOrderByNumber.pending, (state) => {
         state.isLoading = true;
         state.error = null;

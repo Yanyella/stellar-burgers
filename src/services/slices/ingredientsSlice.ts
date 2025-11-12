@@ -3,19 +3,19 @@ import { getIngredientsApi } from '@api';
 import { TIngredient } from '@utils-types';
 
 interface IngredientsState {
-  ingredients: TIngredient[];
-  isLoading: boolean;
-  error: string | null;
+  ingredients: TIngredient[]; //массив ингредиентов
+  isLoading: boolean; //загрузка
+  error: string | null; //ошибки
 }
-
+//начальное состояние
 const initialState: IngredientsState = {
   ingredients: [],
   isLoading: false,
   error: null
 };
-
+//загрузка ингредиентов
 export const getIngredients = createAsyncThunk(
-  'ingredients/fetchIngredients',
+  'ingredients/getIngredients',
   async (_, { rejectWithValue }) => {
     try {
       return await getIngredientsApi();
@@ -30,7 +30,7 @@ const ingredientsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
+    builder //обработка загрузки ингредиентов
       .addCase(getIngredients.pending, (state) => {
         state.isLoading = true;
         state.error = null;

@@ -24,7 +24,14 @@ const initialState: IOrdersState = {
 //получение списка заказов
 export const getOrders = createAsyncThunk(
   'order/getOrders',
-  async () => await getOrdersApi()
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getOrdersApi();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
 );
 
 // Создание нового заказа

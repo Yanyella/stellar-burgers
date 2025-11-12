@@ -8,19 +8,17 @@ import { getIngredients } from '../../services/slices/ingredientsSlice';
 
 export const Feed: FC = () => {
   const dispatch = useDispatch();
-  const { orders, isLoading, error } = useSelector((state) => state.feed);
+  const orders = useSelector((state) => state.feed.orders);
+  const error = useSelector((state) => state.feed.error);
   useEffect(() => {
     dispatch(getFeeds());
-    dispatch(getIngredients());
   }, [dispatch]);
-
-  if (isLoading) {
+  if (!orders.length) {
     return <Preloader />;
   }
 
   const handleGetFeeds = () => {
     dispatch(getFeeds());
-    dispatch(getIngredients());
   };
 
   if (error) {

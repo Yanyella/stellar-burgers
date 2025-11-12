@@ -9,28 +9,28 @@ import {
   logoutApi
 } from '@api';
 
-type TUserState = {
-  user: TUser | null;
-  isAuthenticated: boolean;
-  isAuthChecked: boolean;
-  loginUserRequest: boolean;
-  loginUserError: string | null;
-  registerUserRequest: boolean;
-  registerUserError: string | null;
-  isLoading: boolean;
-};
+interface TUserState {
+  user: TUser | null; //данные пользователя
+  authentication: boolean; //аутентификация
+  authorize: boolean; //авторизация
+  userRequest: boolean; //вход пользователя
+  userError: string | null; //ошибка
+  registerUser: boolean; //регистрация
+  registerError: string | null; //ошибка
+  loading: boolean; //загрузка
+}
 
 const initialState: TUserState = {
   user: null,
-  isAuthenticated: false,
-  isAuthChecked: false,
-  loginUserRequest: false,
-  loginUserError: null,
-  registerUserRequest: false,
-  registerUserError: null,
-  isLoading: false
+  authentication: false,
+  authorize: false,
+  userRequest: false,
+  userError: null,
+  registerUser: false,
+  registerError: null,
+  loading: false
 };
-
+//загрузка данных пользователя
 export const getUser = createAsyncThunk(
   'user/getUser',
   async (_, { rejectWithValue }) => {
@@ -98,22 +98,22 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setAuthChecked: (state, action: PayloadAction<boolean>) => {
-      state.isAuthChecked = action.payload;
+      state.authentication = action.payload;
     },
     clearUserErrors: (state) => {
-      state.loginUserError = null;
-      state.registerUserError = null;
+      state.userError = null;
+      state.registerError = null;
     },
     setUser: (state, action: PayloadAction<TUser | null>) => {
       state.user = action.payload;
     },
     setAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.isAuthenticated = action.payload;
+      state.authentication = action.payload;
     },
     logoutUser: (state) => {
       state.user = null;
-      state.isAuthenticated = false;
-      state.isAuthChecked = true;
+      state.authentication = false;
+      state.authorize = true;
       localStorage.removeItem('refreshToken');
       document.cookie = 'accessToken=; Max-Age=0';
     }
@@ -121,51 +121,50 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getUser.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
       })
       .addCase(getUser.fulfilled, (state, action: PayloadAction<TUser>) => {
-        state.isLoading = false;
         state.user = action.payload;
-        state.isAuthenticated = true;
-        state.isAuthChecked = true;
+        state.authentication = true;
+        state.authorize = true;
+        state.loading = false;
       })
       .addCase(getUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isAuthChecked = true;
-        state.isAuthenticated = false;
+        state.authentication = true;
+        state.authorize = false;
         state.user = null;
+        state.loading = false;
       })
       .addCase(registerUser.pending, (state) => {
-        state.registerUserRequest = true;
-        state.registerUserError = null;
+        state.registerUser = true;
+        state.registerError = null;
       })
       .addCase(
         registerUser.fulfilled,
         (state, action: PayloadAction<TUser>) => {
-          state.registerUserRequest = false;
           state.user = action.payload;
-          state.isAuthenticated = true;
-          state.isAuthChecked = true;
+          state.authentication = true;
+          state.authorize = true;
+          state.registerUser = false;
         }
       )
       .addCase(registerUser.rejected, (state, action) => {
-        state.registerUserRequest = false;
-        state.registerUserError =
-          (action.payload as string) || 'Ошибка регистрации';
+        state.registerUser = false;
+        state.registerError = action.payload as string;
       })
       .addCase(loginUser.pending, (state) => {
-        state.loginUserRequest = true;
-        state.loginUserError = null;
+        state.userRequest = true;
+        state.userError = null;
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<TUser>) => {
-        state.loginUserRequest = false;
+        state.userRequest = false;
         state.user = action.payload;
-        state.isAuthenticated = true;
-        state.isAuthChecked = true;
+        state.authentication = true;
+        state.authorize = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.loginUserRequest = false;
-        state.loginUserError = (action.payload as string) || 'Ошибка входа';
+        state.userRequest = false;
+        state.userError = action.payload as string;
       })
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<TUser>) => {
         state.user = action.payload;

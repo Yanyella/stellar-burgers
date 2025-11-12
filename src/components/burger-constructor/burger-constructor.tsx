@@ -9,7 +9,7 @@ import { RootState, AppDispatch } from '../../services/store';
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const isAuth = useSelector((state: RootState) => state.user.isAuthenticated);
+  const isAuth = useSelector((state: RootState) => state.user.authentication);
 
   const constructorItems = useSelector((state: RootState) => state.burger);
 
