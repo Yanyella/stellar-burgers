@@ -11,15 +11,15 @@ import {
 
 interface TUserState {
   user: TUser | null; //данные пользователя
-  authentication: boolean; //аутентификация
-  authorize: boolean; //авторизация
+  authentication: boolean; //проверка аутентификации
+  authorize: boolean; //статус авторизации (вошел/не вошел)
   userRequest: boolean; //вход пользователя
-  userError: string | null; //ошибка
+  userError: string | null; //ошибка при входе
   registerUser: boolean; //регистрация
-  registerError: string | null; //ошибка
+  registerError: string | null; //ошибка при регистрации
   loading: boolean; //загрузка
 }
-
+//начальное состояние
 const initialState: TUserState = {
   user: null,
   authentication: false,
@@ -42,7 +42,7 @@ export const getUser = createAsyncThunk(
     }
   }
 );
-
+//регистрация нового пользователя
 export const registerUser = createAsyncThunk(
   'user/registerUser',
   async (
@@ -63,7 +63,7 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
-
+//вход пользователя
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (data: { email: string; password: string }, { rejectWithValue }) => {
@@ -77,7 +77,7 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
-
+//обновление данных пользователя
 export const updateUser = createAsyncThunk(
   'user/updateUser',
   async (
@@ -97,19 +97,24 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    //статус проверки аутентификации
     setAuthChecked: (state, action: PayloadAction<boolean>) => {
       state.authentication = action.payload;
     },
+    //очистка ошибок
     clearUserErrors: (state) => {
       state.userError = null;
       state.registerError = null;
     },
+    //установка пользователя
     setUser: (state, action: PayloadAction<TUser | null>) => {
       state.user = action.payload;
     },
+    //установка статуса аутентификации
     setAuthenticated: (state, action: PayloadAction<boolean>) => {
       state.authentication = action.payload;
     },
+    //выход пользователя
     logoutUser: (state) => {
       state.user = null;
       state.authentication = false;
@@ -119,7 +124,7 @@ const userSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder
+    builder //обработка данных пользователя
       .addCase(getUser.pending, (state) => {
         state.loading = true;
       })
@@ -134,7 +139,7 @@ const userSlice = createSlice({
         state.authorize = false;
         state.user = null;
         state.loading = false;
-      })
+      }) //обработка регистрации
       .addCase(registerUser.pending, (state) => {
         state.registerUser = true;
         state.registerError = null;
@@ -151,7 +156,7 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.registerUser = false;
         state.registerError = action.payload as string;
-      })
+      }) //обработка входа
       .addCase(loginUser.pending, (state) => {
         state.userRequest = true;
         state.userError = null;
@@ -165,7 +170,7 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.userRequest = false;
         state.userError = action.payload as string;
-      })
+      }) //обработка обновления данных пользователя
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<TUser>) => {
         state.user = action.payload;
       });
