@@ -13,9 +13,5 @@ export const ProfileOrders: FC = () => {
     dispatch(getOrders());
   }, [dispatch]);
 
-  if (loading) {
-    return <Preloader />;
-  }
-
-  return <ProfileOrdersUI orders={orders || []} />;
+  return <ProfileOrdersUI orders={orders} />;
 };

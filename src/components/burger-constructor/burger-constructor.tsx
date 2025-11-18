@@ -1,24 +1,19 @@
 import { FC, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from '../../services/store';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useNavigate } from 'react-router-dom';
 import { createOrder, clearOrder } from '../../services/slices/orderSlice';
-import { RootState, AppDispatch } from '../../services/store';
 
 export const BurgerConstructor: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isAuth = useSelector((state: RootState) => state.user.authentication);
+  const isAuth = useSelector((state) => state.user.authorize);
 
-  const constructorItems = useSelector((state: RootState) => state.burger);
+  const constructorItems = useSelector((state) => state.burger);
 
-  const orderRequest = useSelector(
-    (state: RootState) => state.orders.orderRequest
-  );
-  const orderModalData = useSelector(
-    (state: RootState) => state.orders.orderModal
-  );
+  const orderRequest = useSelector((state) => state.orders.orderRequest);
+  const orderModalData = useSelector((state) => state.orders.orderModal);
 
   const onOrderClick = () => {
     if (!isAuth) {

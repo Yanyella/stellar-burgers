@@ -11,7 +11,7 @@ export const Register: FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const errorText = useSelector((state: RootState) => state.user.registerError);
+  const errorText = useSelector((state) => state.user.registerError);
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();

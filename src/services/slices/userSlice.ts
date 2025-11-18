@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { setCookie, getCookie } from '../../utils/cookie';
+import { setCookie, getCookie, deleteCookie } from '../../utils/cookie';
 import { TUser } from '@utils-types';
 import {
   registerUserApi,
@@ -92,39 +92,43 @@ export const updateUser = createAsyncThunk(
     }
   }
 );
+//обновоение данных при выходе пользователя
+export const logout = createAsyncThunk(
+  'user/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await logoutApi();
+      deleteCookie('accessToken');
+      localStorage.removeItem('refreshToken');
+      return;
+    } catch (error: any) {
+      deleteCookie('accessToken');
+      localStorage.removeItem('refreshToken');
+      return rejectWithValue(error.message || 'Ошибка выхода');
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    //статус проверки аутентификации
     setAuthChecked: (state, action: PayloadAction<boolean>) => {
       state.authentication = action.payload;
     },
-    //очистка ошибок
     clearUserErrors: (state) => {
       state.userError = null;
       state.registerError = null;
     },
-    //установка пользователя
     setUser: (state, action: PayloadAction<TUser | null>) => {
       state.user = action.payload;
     },
-    //установка статуса аутентификации
     setAuthenticated: (state, action: PayloadAction<boolean>) => {
       state.authentication = action.payload;
-    },
-    //выход пользователя
-    logoutUser: (state) => {
-      state.user = null;
-      state.authentication = false;
-      state.authorize = true;
-      localStorage.removeItem('refreshToken');
-      document.cookie = 'accessToken=; Max-Age=0';
     }
   },
   extraReducers: (builder) => {
-    builder //обработка данных пользователя
+    builder
       .addCase(getUser.pending, (state) => {
         state.loading = true;
       })
@@ -139,7 +143,7 @@ const userSlice = createSlice({
         state.authorize = false;
         state.user = null;
         state.loading = false;
-      }) //обработка регистрации
+      })
       .addCase(registerUser.pending, (state) => {
         state.registerUser = true;
         state.registerError = null;
@@ -156,7 +160,7 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.registerUser = false;
         state.registerError = action.payload as string;
-      }) //обработка входа
+      })
       .addCase(loginUser.pending, (state) => {
         state.userRequest = true;
         state.userError = null;
@@ -170,19 +174,35 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.userRequest = false;
         state.userError = action.payload as string;
-      }) //обработка обновления данных пользователя
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(updateUser.fulfilled, (state, action: PayloadAction<TUser>) => {
         state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
+        state.userError = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.userError = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.loading = false;
+        state.authentication = false;
+        state.authorize = false;
+        state.user = null;
       });
   }
 });
 
-export const {
-  setAuthChecked,
-  clearUserErrors,
-  setUser,
-  setAuthenticated,
-  logoutUser
-} = userSlice.actions;
+export const { setAuthChecked, clearUserErrors, setUser, setAuthenticated } =
+  userSlice.actions;
 
 export default userSlice.reducer;
