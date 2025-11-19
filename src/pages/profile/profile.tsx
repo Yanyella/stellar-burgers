@@ -47,7 +47,6 @@ export const Profile: FC = () => {
       [e.target.name]: e.target.value
     }));
   };
-
   return (
     <ProfileUI
       formValue={formValue}

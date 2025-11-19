@@ -112,21 +112,7 @@ export const logout = createAsyncThunk(
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {
-    setAuthChecked: (state, action: PayloadAction<boolean>) => {
-      state.authentication = action.payload;
-    },
-    clearUserErrors: (state) => {
-      state.userError = null;
-      state.registerError = null;
-    },
-    setUser: (state, action: PayloadAction<TUser | null>) => {
-      state.user = action.payload;
-    },
-    setAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.authentication = action.payload;
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getUser.pending, (state) => {
@@ -138,7 +124,7 @@ const userSlice = createSlice({
         state.authorize = true;
         state.loading = false;
       })
-      .addCase(getUser.rejected, (state, action) => {
+      .addCase(getUser.rejected, (state) => {
         state.authentication = true;
         state.authorize = false;
         state.user = null;
@@ -152,7 +138,6 @@ const userSlice = createSlice({
         registerUser.fulfilled,
         (state, action: PayloadAction<TUser>) => {
           state.user = action.payload;
-          state.authentication = true;
           state.authorize = true;
           state.registerUser = false;
         }
@@ -168,7 +153,6 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<TUser>) => {
         state.userRequest = false;
         state.user = action.payload;
-        state.authentication = true;
         state.authorize = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -182,27 +166,25 @@ const userSlice = createSlice({
         state.user = action.payload;
         state.loading = false;
       })
-      .addCase(updateUser.rejected, (state, action) => {
+      .addCase(updateUser.rejected, (state) => {
         state.loading = false;
       })
       .addCase(logout.pending, (state) => {
         state.loading = true;
-        state.userError = null;
-      })
-      .addCase(logout.rejected, (state, action) => {
-        state.loading = false;
-        state.userError = null;
       })
       .addCase(logout.fulfilled, (state) => {
         state.loading = false;
         state.authentication = false;
-        state.authorize = false;
         state.user = null;
+        state.authorize = false;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.loading = false;
+        state.authentication = false;
+        state.user = null;
+        state.authorize = false;
       });
   }
 });
-
-export const { setAuthChecked, clearUserErrors, setUser, setAuthenticated } =
-  userSlice.actions;
 
 export default userSlice.reducer;
