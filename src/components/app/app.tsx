@@ -25,7 +25,6 @@ function App() {
   const location = useLocation();
   const backgroundLocation = location.state?.background;
   const navigate = useNavigate();
-
   useEffect(() => {
     dispatch(getUser());
     dispatch(getIngredients());
@@ -41,7 +40,6 @@ function App() {
       <Routes location={backgroundLocation || location}>
         <Route path={'/'} element={<ConstructorPage />} />
         <Route path={'/feed'} element={<Feed />} />
-        {/* Маршруты только для НЕавторизованных пользователей */}
         <Route
           path={'/login'}
           element={
@@ -90,8 +88,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path={'/feed/:orderNumber'} element={<OrderInfo />} />
-        <Route path={'/ingredients/:id'} element={<IngredientDetails />} />
         <Route
           path={'/profile/orders/:orderNumber'}
           element={
@@ -100,6 +96,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path={'/feed/:orderNumber'} element={<OrderInfo />} />
+        <Route path={'/ingredients/:id'} element={<IngredientDetails />} />
         <Route path={'*'} element={<NotFound404 />} />
       </Routes>
 

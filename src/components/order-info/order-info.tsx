@@ -20,12 +20,6 @@ export const OrderInfo: FC = () => {
     }
   }, [dispatch, number, orderData]);
 
-  useEffect(() => {
-    if (ingredients.length === 0) {
-      dispatch(getIngredients());
-    }
-  }, [dispatch, ingredients.length]);
-
   /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;

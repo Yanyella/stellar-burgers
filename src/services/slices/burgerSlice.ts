@@ -2,8 +2,8 @@ import { createSlice, PayloadAction, nanoid } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
 
 interface IBurgerState {
-  bun: TConstructorIngredient | null;
-  ingredients: TConstructorIngredient[];
+  bun: TConstructorIngredient | null; //булка
+  ingredients: TConstructorIngredient[]; //ингредиенты
 }
 // начальное состояние
 const initialState: IBurgerState = {
@@ -29,12 +29,6 @@ export const burgerSlice = createSlice({
         return { payload: { ...ingredient, id } };
       }
     },
-    //удалить ингредиент
-    deleteIngredient: (state, action: PayloadAction<string>) => {
-      state.ingredients = state.ingredients.filter(
-        (item) => item.id !== action.payload
-      );
-    },
     //переложить ингредиенты
     transferIngredient: (
       state,
@@ -53,6 +47,12 @@ export const burgerSlice = createSlice({
       const [transferItem] = ingredients.splice(fromIndex, 1);
       ingredients.splice(toIndex, 0, transferItem);
     },
+    //удалить ингредиент
+    deleteIngredient: (state, action: PayloadAction<string>) => {
+      state.ingredients = state.ingredients.filter(
+        (item) => item.id !== action.payload
+      );
+    },
     //удалить бургер
     clearConstructor: (state) => {
       state.bun = null;
@@ -63,8 +63,8 @@ export const burgerSlice = createSlice({
 
 export const {
   addIngredient,
-  deleteIngredient,
   transferIngredient,
+  deleteIngredient,
   clearConstructor
 } = burgerSlice.actions;
 

@@ -14,12 +14,6 @@ export const IngredientDetails: FC = () => {
     (ingredient) => ingredient._id === id
   );
 
-  useEffect(() => {
-    if (ingredients.length === 0) {
-      dispatch(getIngredients());
-    }
-  }, [dispatch, ingredients.length]);
-
   if (isLoading || !ingredientData) {
     return <Preloader />;
   }

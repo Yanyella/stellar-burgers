@@ -14,9 +14,10 @@ export const ProtectedRoute: FC<TProps> = ({
 }) => {
   const location = useLocation();
   const user = useSelector((state) => state.user.user);
-  const isAuthChecked = useSelector((state) => state.user.isAuthChecked);
+  const isAuthChecked = useSelector((state) => state.user.authentication);
+  const loading = useSelector((state) => state.user.loading);
 
-  if (!isAuthChecked) {
+  if (!isAuthChecked && loading) {
     return <Preloader />;
   }
 
