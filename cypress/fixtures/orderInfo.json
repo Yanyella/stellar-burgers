@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "name": "Супер бургер",
+  "order": {
+    "ingredients": [
+      {
+        "_id": "643d69a5c3f7b9001cfa093c",
+        "name": "Краторная булка N-200i",
+        "type": "bun",
+        "proteins": 80,
+        "fat": 24,
+        "carbohydrates": 53,
+        "calories": 420,
+        "price": 1255,
+        "image": "https://code.s3.yandex.net/react/code/bun-02.png",
+        "image_mobile": "https://code.s3.yandex.net/react/code/bun-02-mobile.png",
+        "image_large": "https://code.s3.yandex.net/react/code/bun-02-large.png",
+        "__v": 0
+      }
+    ],
+    "_id": "test-order-id",
+    "owner": {
+      "name": "Test Test",
+      "email": "test@mail.ru",
+      "createdAt": "2024-03-27T17:57:59.457Z",
+      "updatedAt": "2024-03-30T18:13:09.976Z"
+    },
+    "status": "done",
+    "name": "Супер бургер",
+    "createdAt": "2024-04-14T10:50:04.620Z",
+    "updatedAt": "2024-04-14T10:50:05.259Z",
+    "number": 10001,
+    "price": 4012
+  }
+}
