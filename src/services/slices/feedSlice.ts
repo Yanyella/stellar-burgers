@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getFeedsApi, getOrderByNumberApi } from '@api';
+import { getFeedsApi, getOrderByNumberApi } from '../../utils/burger-api';
 import { TOrder } from '@utils-types';
-interface TFeedsState {
+export interface TFeedsState {
   orders: TOrder[]; //массив заказов
   total: number; //общее кол-во заказов
   totalToday: number; //кол-во сегодняшних заказов
@@ -69,6 +69,7 @@ const feedSlice = createSlice({
       })
       .addCase(getOrderByNumber.fulfilled, (state) => {
         state.isLoading = false;
+        state.error = null;
       })
       .addCase(getOrderByNumber.rejected, (state, action) => {
         state.isLoading = false;

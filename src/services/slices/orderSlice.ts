@@ -1,8 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { orderBurgerApi, getOrderByNumberApi, getOrdersApi } from '@api';
+import {
+  orderBurgerApi,
+  getOrderByNumberApi,
+  getOrdersApi
+} from '../../utils/burger-api';
 import { TOrder } from '@utils-types';
 
-interface IOrdersState {
+export interface IOrdersState {
   orders: TOrder[]; //все заказы
   orderLoading: boolean; //загрузка конкретного заказа
   orderModal: TOrder | null; //модальное окно заказа
@@ -12,7 +16,7 @@ interface IOrdersState {
 }
 
 //начальное состояние
-const initialState: IOrdersState = {
+export const initialState: IOrdersState = {
   orders: [], //все заказы
   orderLoading: false, //загрузка конкретного заказа
   orderModal: null, //модальное окно заказа

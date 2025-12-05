@@ -7,9 +7,9 @@ import {
   getUserApi,
   updateUserApi,
   logoutApi
-} from '@api';
+} from '../../utils/burger-api';
 
-interface TUserState {
+export interface TUserState {
   user: TUser | null; //данные пользователя
   authentication: boolean; //проверка аутентификации
   authorize: boolean; //статус авторизации (вошел/не вошел)
@@ -20,7 +20,7 @@ interface TUserState {
   loading: boolean; //загрузка
 }
 //начальное состояние
-const initialState: TUserState = {
+export const initialState: TUserState = {
   user: null,
   authentication: false,
   authorize: false,
